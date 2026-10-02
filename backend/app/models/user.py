@@ -36,6 +36,12 @@ class User(Base):
         nullable=False,
     )
 
+    role: Mapped[str] = mapped_column(
+        String(30),
+        default="TOURIST",
+        nullable=False,
+    )
+
     kyc_status: Mapped[str] = mapped_column(
         String(30),
         default="PENDING",
