@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
@@ -17,6 +18,12 @@ class Incident(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
+    )
+
+    local_incident_id: Mapped[str | None] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=True,
     )
 
     latitude: Mapped[float] = mapped_column(
@@ -63,7 +70,13 @@ class Incident(Base):
         nullable=False,
     )
 
+    
     resolved_at: Mapped[datetime | None] = mapped_column(
         DateTime,
+        nullable=True,
+    )
+
+    resolution_source: Mapped[str | None] = mapped_column(
+        String(30),
         nullable=True,
     )

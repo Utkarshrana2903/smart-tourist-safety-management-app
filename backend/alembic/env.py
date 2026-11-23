@@ -9,6 +9,8 @@ from app.database.base import Base
 from app.models.user import User
 from app.models.incident import Incident
 from app.models.incident_event import IncidentEvent
+from app.models.risk_zone import RiskZone
+from app.models.hazard import Hazard
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

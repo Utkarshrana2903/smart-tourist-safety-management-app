@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import Date, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
@@ -28,6 +28,11 @@ class User(Base):
     email: Mapped[str | None] = mapped_column(
         String(255),
         unique=True,
+        nullable=True,
+    )
+
+    date_of_birth: Mapped[date | None] = mapped_column(
+        Date,
         nullable=True,
     )
 

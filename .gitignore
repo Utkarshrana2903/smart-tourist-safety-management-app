@@ -26,3 +26,47 @@ mobile/build/
 # OS
 .DS_Store
 Thumbs.db
+# Private SOS audio uploads
+backend/private_storage/
+
+# Backup files
+*.bak
+*.bak_*
+*.bak.*
+
+# Node.js / Command Center
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Flutter generated files
+**/.dart_tool/
+**/build/
+**/local.properties
+
+# Python cache and test artifacts
+**/__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Android signing credentials
+**/key.properties
+*.jks
+*.keystore
+
+# Gradle cache
+**/.gradle/
+
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Empty backup placeholder
+command-center/modoner_backup_before_demo_zone_cleanup.sql
+

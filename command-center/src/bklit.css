@@ -1,0 +1,130 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--bklit-background);
+  --color-foreground: var(--bklit-foreground);
+  --color-card: var(--bklit-card);
+  --color-card-foreground: var(--bklit-foreground);
+  --color-popover: var(--bklit-card);
+  --color-popover-foreground: var(--bklit-foreground);
+  --color-primary: var(--bklit-primary);
+  --color-primary-foreground: var(--bklit-background);
+  --color-secondary: var(--bklit-secondary);
+  --color-secondary-foreground: var(--bklit-foreground);
+  --color-muted: var(--bklit-muted);
+  --color-muted-foreground: var(--bklit-muted-foreground);
+  --color-accent: var(--bklit-secondary);
+  --color-accent-foreground: var(--bklit-foreground);
+  --color-border: var(--bklit-border);
+  --color-input: var(--bklit-border);
+  --color-ring: var(--bklit-primary);
+  --color-chart-scale-pattern-color: var(----chart-scale-pattern-color);
+  --color-chart-scale-05: var(----chart-scale-05);
+  --color-chart-scale-04: var(----chart-scale-04);
+  --color-chart-scale-03: var(----chart-scale-03);
+  --color-chart-scale-02: var(----chart-scale-02);
+  --color-chart-scale-01: var(----chart-scale-01);
+  --color-chart-label: var(----chart-label);
+  --color-chart-marker-foreground: var(----chart-marker-foreground);
+  --color-chart-marker-border: var(----chart-marker-border);
+  --color-chart-marker-background: var(----chart-marker-background);
+  --color-chart-tooltip-muted: var(----chart-tooltip-muted);
+  --color-chart-tooltip-foreground: var(----chart-tooltip-foreground);
+  --color-chart-tooltip-background: var(----chart-tooltip-background);
+  --chart-brush-border: var(----chart-brush-border);
+  --color-chart-grid: var(----chart-grid);
+  --color-chart-crosshair: var(----chart-crosshair);
+  --chart-line-secondary: var(----chart-line-secondary);
+  --chart-line-primary: var(----chart-line-primary);
+  --color-chart-foreground-muted: var(----chart-foreground-muted);
+  --color-chart-foreground: var(----chart-foreground);
+  --color-chart-background: var(----chart-background);
+  --color-chart-5: var(----chart-5);
+  --color-chart-4: var(----chart-4);
+  --color-chart-3: var(----chart-3);
+  --color-chart-2: var(----chart-2);
+  --color-chart-1: var(----chart-1);
+}
+
+.bklit-chart-root {
+  --bklit-background: #f5f3ed;
+  --bklit-foreground: #173238;
+  --bklit-card: #fbfaf6;
+  --bklit-primary: #205b59;
+  --bklit-secondary: #e9e4d8;
+  --bklit-muted: #ece9e1;
+  --bklit-muted-foreground: #607472;
+  --bklit-border: #d7d8ce;
+
+  --chart-1: #205b59;
+  --chart-2: #bd8428;
+  --chart-3: #d65d5d;
+  --chart-4: #7088a7;
+  --chart-5: #78a58a;
+
+  --chart-background: #f5f3ed;
+  --chart-foreground: #173238;
+  --chart-foreground-muted: #607472;
+  --chart-line-primary: #205b59;
+  --chart-line-secondary: #bd8428;
+  --chart-crosshair: #bd8428;
+  --chart-grid: #d7d8ce;
+
+  color: var(--bklit-foreground);
+}
+
+:root {
+  --chart-1: oklch(0.32 0 none);
+  --chart-2: oklch(0.41 0 none);
+  --chart-3: oklch(0.54 0 none);
+  --chart-4: oklch(0.71 0 none);
+  --chart-5: oklch(0.89 0 none);
+  --chart-background: oklch(1 0 0);
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: oklch(0.55 0.014 260);
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: oklch(0.21 0.006 285 / 0.8);
+  --chart-tooltip-foreground: oklch(0.985 0 0);
+  --chart-tooltip-muted: oklch(0.65 0.01 260);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: oklch(0.45 0.01 260);
+  --chart-scale-01: oklch(0.98 0.003 106);
+  --chart-scale-02: oklch(0.92 0.008 106);
+  --chart-scale-03: oklch(0.82 0.015 106);
+  --chart-scale-04: oklch(0.68 0.02 106);
+  --chart-scale-05: oklch(0.55 0.025 106);
+  --chart-scale-pattern-color: oklch(0.96 0.005 106);
+}
+
+.dark {
+  --chart-1: oklch(1 0 none);
+  --chart-2: oklch(0.73 0 none);
+  --chart-3: oklch(0.51 0 none);
+  --chart-4: oklch(0.39 0 none);
+  --chart-5: oklch(0.32 0 none);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-01: oklch(0.28 0.03 270);
+  --chart-scale-02: oklch(0.38 0.04 270);
+  --chart-scale-03: oklch(0.48 0.05 270);
+  --chart-scale-04: oklch(0.58 0.06 270);
+  --chart-scale-05: oklch(0.68 0.07 270);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
+}

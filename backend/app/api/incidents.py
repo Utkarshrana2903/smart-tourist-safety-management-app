@@ -1,4 +1,5 @@
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -14,13 +15,18 @@ from app.schemas.incident import (
     IncidentResponse,
 )
 from app.models.incident_event import IncidentEvent
+from app.services.risk_zone_service import record_sos_for_risk_zones
 from app.core.auth import get_current_user, require_role
 
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/incidents",
     tags=["Incidents"],
 )
+
+
 
 
 @router.post(
@@ -33,33 +39,120 @@ def create_incident(
     current_user: User = Depends(require_role("TOURIST")),
     db: Session = Depends(get_db),
 ):
+    is_resolved = incident_data.emergency_status == "RESOLVED"
 
-    incident = Incident(
+    reported_resolved_at = incident_data.resolved_at
+
+    # Store timezone-aware timestamps as naive UTC for the database.
+    if (
+        reported_resolved_at is not None
+        and reported_resolved_at.tzinfo is not None
+    ):
+        reported_resolved_at = reported_resolved_at.astimezone(
+            timezone.utc
+        ).replace(tzinfo=None)
+
+    if is_resolved and reported_resolved_at is None:
+        reported_resolved_at = datetime.utcnow()
+
+    # Check whether this local SOS was already received.
+    existing_incident = None
+
+    if incident_data.local_incident_id:
+        existing_incident = (
+            db.query(Incident)
+            .filter(
+                Incident.user_id == current_user.id,
+                Incident.local_incident_id
+                == incident_data.local_incident_id,
+            )
+            .first()
+        )
+
+    if existing_incident is not None:
+        # A later upload may carry a resolution made offline.
+        # Apply it only if the server has not already resolved the incident.
+        if is_resolved and existing_incident.status != "RESOLVED":
+            existing_incident.status = "RESOLVED"
+            existing_incident.resolved_at = (
+                reported_resolved_at or datetime.utcnow()
+            )
+            existing_incident.resolution_source = "tourist"
+
+            db.add(
+                IncidentEvent(
+                    incident_id=existing_incident.id,
+                    event_type="RESOLVED",
+                    metadata={
+                        "source": "tourist",
+                        "reported_offline": True,
+                    },
+                )
+            )
+
+            db.commit()
+            db.refresh(existing_incident)
+
+        # Never reset an existing incident to CREATED.
+        return existing_incident
+
+    # Preserve the local resolution even if this is the first upload.
+    new_incident = Incident(
         user_id=current_user.id,
+        local_incident_id=incident_data.local_incident_id,
         latitude=incident_data.latitude,
         longitude=incident_data.longitude,
         timestamp=incident_data.timestamp,
         severity=incident_data.severity,
         transmission_method=incident_data.transmission_method,
         audio_url=incident_data.audio_url,
+        status="RESOLVED" if is_resolved else "CREATED",
+        resolved_at=reported_resolved_at if is_resolved else None,
+        resolution_source="tourist" if is_resolved else None,
     )
 
-    db.add(incident)
+    db.add(new_incident)
     db.flush()
 
-    event = IncidentEvent(
-    incident_id=incident.id,
-    event_type="SOS_CREATED",
-    metadata={
-        "transmission_method": incident.transmission_method,
-    },
-)
+    db.add(
+        IncidentEvent(
+            incident_id=new_incident.id,
+            event_type="SOS_CREATED",
+            metadata={
+                "transmission_method": new_incident.transmission_method,
+                "emergency_status": incident_data.emergency_status,
+            },
+        )
+    )
 
-    db.add(event)
+    if is_resolved:
+        db.add(
+            IncidentEvent(
+                incident_id=new_incident.id,
+                event_type="RESOLVED",
+                metadata={
+                    "source": "tourist",
+                    "reported_offline": True,
+                },
+            )
+        )
+
     db.commit()
-    db.refresh(incident)
+    db.refresh(new_incident)
 
-    return incident
+    # The SOS is committed first. Risk-zone failure must not undo SOS delivery.
+    try:
+        record_sos_for_risk_zones(db, new_incident)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Risk-zone update failed for accepted incident %s",
+            new_incident.id,
+        )
+
+    return new_incident
+
+
 
 
 @router.get(
@@ -187,6 +280,7 @@ def resolve_incident(
 
     incident.status = "RESOLVED"
     incident.resolved_at = datetime.utcnow()
+    incident.resolution_source = "command_center"
 
     event = IncidentEvent(
     incident_id=incident.id,

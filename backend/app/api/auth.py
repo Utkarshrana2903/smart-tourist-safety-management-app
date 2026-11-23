@@ -6,9 +6,11 @@ from app.core.jwt import create_access_token
 from app.core.security import hash_password, verify_password
 from app.database.dependencies import get_db
 from app.models.user import User
+from app.core.auth import get_current_user
 from app.schemas.auth import (
     LoginResponse,
     UserLogin,
+    UserProfileUpdate,
     UserRegister,
     UserResponse,
 )
@@ -54,6 +56,7 @@ def register_user(
         name=user_data.name,
         phone=user_data.phone,
         email=user_data.email,
+        date_of_birth=user_data.date_of_birth,
         password_hash=hash_password(user_data.password),
     )
 
@@ -96,3 +99,29 @@ def login_user(
         access_token=access_token,
         user=user,
     )
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+def get_my_profile(
+    current_user: User = Depends(get_current_user),
+):
+    return current_user
+
+
+@router.patch(
+    "/me/profile",
+    response_model=UserResponse,
+)
+def update_my_profile(
+    profile_data: UserProfileUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.date_of_birth = profile_data.date_of_birth
+
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
